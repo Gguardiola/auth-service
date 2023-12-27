@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const {check, validationResult} = require('express-validator');
-const {users} = require('../db');
 const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
+const db = require('..database/queries');
+
 if(process.env.NODE_ENV != "production") require('dotenv').config();
 const SECRET_KEY = process.env.JWT_SECRET
 
@@ -20,42 +21,66 @@ router.post('/signup', [
         return res.status(401).json({success: false, message: errors.array()});
     }
 
-    //db validation
+    try{
+        let user = db.checkIfUserExists(email);
+        if(user.rows.length > 0) {
+            console.log("Error: User already exists");
+            return res.status(401).json({success: false, message: [{message: "User already exists"}]});
+        }
 
-    let user = users.find(user => {return user.email === email});
-    if(user) {
-        console.log("Error: User already exists");
-        return res.status(401).json({success: false, message: [{message: "User already exists"}]});
+        const hashedPassword = await bcrypt.hash(password, 10);
+        //TODO: complete the signup process with the username, lastname and birthdate
+        db.insertUser(email, hashedPassword);
+        const token = await JWT.sign({email}, SECRET_KEY, {expiresIn: "48h"});
+
+        res.json({success: true, token});
+    } catch(error) {
+        console.error('Error during signup:', error.message);
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    users.push({email, password: hashedPassword});
-    //TODO: store the secret on dot env
-    const token = await JWT.sign({email}, SECRET_KEY, {expiresIn: "48h"});
-
-    res.json({success: true, token});
-
 });
 
 router.post('/login', async (req, res) => {
     const {password, email} = req.body;
-    let user = users.find(user => {return user.email === email});
-    if(!user) {
-        console.log("Error: Invalid credentials");
-        return res.status(400).json({ success: false, message: 'Invalid credentials' });
+
+    try{
+        let user = db.checkIfUserExists(email);
+        if(!user.rows.length > 0) {
+            console.log("Error: Invalid credentials");
+            return res.status(400).json({ success: false, message: 'Invalid credentials' });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if(!isPasswordValid) {
+            console.log("Error: Invalid credentials");
+            return res.status(400).json({ success: false, message: 'Invalid credentials' });
+        }
+
+        const token = await JWT.sign({email}, SECRET_KEY, {expiresIn: "48h"});
+
+        res.json({success: true, token});
+    } catch(error) {
+        console.error('Error during login:', error.message);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+router.post('/logout', async (req, res) => {
+    const token = req.headers.authorization;
+
+    if (!token) {
+        return res.status(401).json({ success: false, message: 'Token not provided' });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    try {
+        await db.logoutUser(token);
+        res.json({ success: true, message: 'Logout successful' });
 
-    if(!isPasswordValid) {
-        console.log("Error: Invalid credentials");
-        return res.status(400).json({ success: false, message: 'Invalid credentials' });
+    } catch (error) {
+        console.error('Error during logout:', error.message);
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
-
-    const token = await JWT.sign({email}, SECRET_KEY, {expiresIn: "48h"});
-
-    res.json({success: true, token});
-
 });
 
 router.post('/validate', async (req, res) => {
@@ -66,11 +91,17 @@ router.post('/validate', async (req, res) => {
     }
 
     try {
+        const isBlacklisted = db.checkIfUserTokenBlacklisted(authorization);
+
+        if(isBlacklisted.rows.length > 0) {
+            console.log("Error: Token blacklisted");
+            return res.status(401).json({ success: false, message: 'Invalid token' });
+        }
         const decoded = await JWT.verify(authorization, SECRET_KEY);
         res.json({success: true, user: decoded});
     } catch (error) {
-        console.log("Error: Invalid token");
-        return res.status(401).json({ success: false, message: 'Invalid token' });
+        console.error('Error during validation:', error.message);
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
 module.exports = router;

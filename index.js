@@ -8,7 +8,6 @@ const LISTEN_PORT = process.env.PORT;
 
 app.use('/auth', auth);
 
-
 app.listen(LISTEN_PORT, () => {
     console.log("AUTH-SERVICE is running on port "+ LISTEN_PORT);
 
