@@ -71,14 +71,14 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/logout', async (req, res) => {
-    const token = req.headers.authorization;
+    const {authorization} = req.headers;
 
-    if (!token) {
+    if (!authorization) {
         return res.status(401).json({ success: false, message: 'Token not provided' });
     }
 
     try {
-        await db.logoutUser(token);
+        await db.logoutUser(authorization);
         res.json({ success: true, message: 'Logout successful' });
 
     } catch (error) {
