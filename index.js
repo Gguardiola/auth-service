@@ -1,24 +1,16 @@
-'use strict';
+const express = require('express');
+const auth = require('./routes/auth');
+const app = express();
+app.use(express.json());
+if(process.env.NODE_ENV != "production") require('dotenv').config();
 
-var path = require('path');
-var http = require('http');
+const SECRET_KEY = process.env.JWT_SECRET
+const LISTEN_PORT = process.env.PORT;
 
-var oas3Tools = require('oas3-tools');
-var serverPort = 3001;
-//final test
-// swaggerRouter configuration
-var options = {
-    routing: {
-        controllers: path.join(__dirname, './controllers')
-    },
-};
+app.use('/auth', auth);
 
-var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/openapi.yaml'), options);
-var app = expressAppConfig.getApp();
 
-// Initialize the Swagger middleware
-http.createServer(app).listen(serverPort, function () {
-    console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
-    console.log('Swagger-ui is available on http://localhost:%d/docs', serverPort);
+app.listen(LISTEN_PORT, () => {
+    console.log("AUTH-SERVICE is running on port "+ LISTEN_PORT);
+
 });
-
