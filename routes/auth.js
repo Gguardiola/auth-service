@@ -18,7 +18,7 @@ router.post('/signup', [
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
         console.log("Error validating input: "+errors.array());
-        return res.status(401).json({success: false, message: errors.array()});
+        return res.status(400).json({success: false, message: errors.array()});
     }
 
     try{
@@ -76,7 +76,6 @@ router.post('/logout', async (req, res) => {
     if (!authorization) {
         return res.status(401).json({ success: false, message: 'Token not provided' });
     }
-
     try {
         await db.logoutUser(authorization);
         res.json({ success: true, message: 'Logout successful' });
