@@ -71,7 +71,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/logout', async (req, res) => {
-    const { authorization } = req.headers;
+    const authorization  = req.headers.authorization;
 
     if (!authorization) {
         return res.status(401).json({ success: false, message: 'Token not provided' });
