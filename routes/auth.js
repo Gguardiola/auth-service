@@ -46,7 +46,7 @@ router.post('/login', async (req, res) => {
     try{
         let user = await db.checkIfUserExists(email);
         if(!user.rows.length > 0) {
-            console.log("Error: Invalid credentials");
+            console.log("Error: User NOT exists");
             return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
         user = user.rows[0];
