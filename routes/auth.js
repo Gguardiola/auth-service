@@ -17,7 +17,7 @@ router.post('/signup', [
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
         console.log("Error validating input: "+errors.array());
-        return res.status(400).json({errors: errors.array()});
+        return res.status(401).json({success: false, message: errors.array()});
     }
 
     //db validation
@@ -25,7 +25,7 @@ router.post('/signup', [
     let user = users.find(user => {return user.email === email});
     if(user) {
         console.log("Error: User already exists");
-        return res.status(400).json({errors: [{message: "User already exists"}]});
+        return res.status(401).json({success: false, message: [{message: "User already exists"}]});
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -42,14 +42,14 @@ router.post('/login', async (req, res) => {
     let user = users.find(user => {return user.email === email});
     if(!user) {
         console.log("Error: Invalid credentials");
-        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if(!isPasswordValid) {
         console.log("Error: Invalid credentials");
-        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
 
     const token = await JWT.sign({email}, SECRET_KEY, {expiresIn: "48h"});
@@ -62,7 +62,7 @@ router.post('/validate', async (req, res) => {
     const {authorization} = req.body;
     if(!authorization) {
         console.log("Error: Token not provided");
-        return res.status(401).json({ success: false, message: 'Token not provided' });
+        return res.status(400).json({ success: false, message: 'Token not provided' });
     }
 
     try {
