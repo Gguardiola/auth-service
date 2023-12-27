@@ -2,7 +2,7 @@ const router = require('express').Router();
 const {check, validationResult} = require('express-validator');
 const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
-const db = require('..database/queries');
+const db = require('../database/queries')
 
 if(process.env.NODE_ENV != "production") require('dotenv').config();
 const SECRET_KEY = process.env.JWT_SECRET
