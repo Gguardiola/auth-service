@@ -4,7 +4,6 @@ const app = express();
 app.use(express.json());
 if(process.env.NODE_ENV != "production") require('dotenv').config();
 
-const SECRET_KEY = process.env.JWT_SECRET
 const LISTEN_PORT = process.env.PORT;
 
 app.use('/auth', auth);
