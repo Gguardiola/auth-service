@@ -22,7 +22,7 @@ router.post('/signup', [
     }
 
     try{
-        let user = db.checkIfUserExists(email);
+        let user = await db.checkIfUserExists(email);
         if(user.rows.length > 0) {
             console.log("Error: User already exists");
             return res.status(401).json({success: false, message: [{message: "User already exists"}]});
@@ -30,7 +30,7 @@ router.post('/signup', [
 
         const hashedPassword = await bcrypt.hash(password, 10);
         //TODO: complete the signup process with the username, lastname and birthdate
-        db.insertUser(email, hashedPassword);
+        await db.insertUser(email, hashedPassword);
         const token = await JWT.sign({email}, SECRET_KEY, {expiresIn: "48h"});
 
         res.json({success: true, token});
@@ -44,7 +44,7 @@ router.post('/login', async (req, res) => {
     const {password, email} = req.body;
 
     try{
-        let user = db.checkIfUserExists(email);
+        let user = await db.checkIfUserExists(email);
         if(!user.rows.length > 0) {
             console.log("Error: Invalid credentials");
             return res.status(400).json({ success: false, message: 'Invalid credentials' });
@@ -91,7 +91,7 @@ router.post('/validate', async (req, res) => {
     }
 
     try {
-        const isBlacklisted = db.checkIfUserTokenBlacklisted(authorization);
+        const isBlacklisted = await db.checkIfUserTokenBlacklisted(authorization);
 
         if(isBlacklisted.rows.length > 0) {
             console.log("Error: Token blacklisted");
