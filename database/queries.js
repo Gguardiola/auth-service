@@ -11,7 +11,7 @@ const checkIfUserTokenBlacklisted = async (token) => {
 }
 
 const insertUser = async (email, hashedPassword) => {
-  await db.query('INSERT INTO users (email, username, lastname, password, birthday) VALUES ($1, $2, $3, $4, $5)', [email, hashedPassword, 'Pep','Pepin','1990-01-01']);
+  await db.query('INSERT INTO users (email, username, lastname, password, birthday) VALUES ($1, $3, $4, $2, $5)', [email, hashedPassword, 'Pep','Pepin','1990-01-01']);
 };
 
 const updateUser = async (email, hashedPassword) => {
@@ -32,5 +32,5 @@ module.exports = {
   insertUser,
   logoutUser,
   checkIfUserTokenBlacklisted,
-  
+
 };
