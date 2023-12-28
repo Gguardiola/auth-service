@@ -105,7 +105,7 @@ router.post('/validate', async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid token' });
         }
         const decoded = await JWT.verify(authorization, SECRET_KEY);
-        console.log("Decoded token: "+JSON.stringify(decoded));
+        
         res.json({success: true, userId: decoded.userId});
     } catch (error) {
         console.error('Error during validation:', error.message);
