@@ -106,7 +106,7 @@ router.post('/validate', async (req, res) => {
         }
         const decoded = await JWT.verify(authorization, SECRET_KEY);
         console.log("Decoded token: "+JSON.stringify(decoded));
-        res.json({success: true, userId: decoded});
+        res.json({success: true, userId: decoded.userId});
     } catch (error) {
         console.error('Error during validation:', error.message);
         res.status(500).json({ success: false, message: 'Internal server error' });
