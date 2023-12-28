@@ -11,7 +11,7 @@ const checkIfUserTokenBlacklisted = async (token) => {
 }
 
 const insertUser = async (email, hashedPassword, username, lastname, birthday) => {
-  await db.query('INSERT INTO users (email, username, lastname, password, birthday) VALUES ($1, $3, $4, $2, $5)', [email, hashedPassword, username, lastname, birthday]);
+  await db.query('INSERT INTO users (email, username, lastname, password, birthday, image_name) VALUES ($1, $3, $4, $2, $5, $6)', [email, hashedPassword, username, lastname, birthday, 'default.png' ]);
 };
 
 const updateUser = async (email, hashedPassword) => {
