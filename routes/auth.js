@@ -64,7 +64,7 @@ router.post('/login',[
             return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
         
-        let isLogged = await db.checkIfUserIsLogged(user.id);
+        let isLogged = await db.checkIfUserIsLogged(JSON.stringify(user.id));
         if(isLogged.rows.length > 0) {
             console.log("User already logged");
             return res.json({success: true, token: isLogged.rows[0].token});
