@@ -9,12 +9,14 @@ const SECRET_KEY = process.env.JWT_SECRET
 
 router.post('/signup', [
     check("email","Please provide a valid email.").isEmail(),
-    check("password","Please provide a password than is greater than 5 characters").isLength({min: 6})
+    check("password","Please provide a password than is greater than 5 characters").isLength({min: 6}),
+    check("username","Please provide a username").isLength({min: 1}),
+    check("lastname","Please provide a lastname").isLength({min: 1}),
+    check("birthday","Please provide a valid date").isISO8601().toDate()
 
 ], async (req, res) => {
-    const {password, email} = req.body;
+    const {password, email, username, lastname, birthday} = req.body;
 
-    //Input validation
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
         console.log("Error validating input: "+errors.array());
@@ -27,21 +29,27 @@ router.post('/signup', [
             console.log("Error: User already exists");
             return res.status(401).json({success: false, message: "User already exists"});
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
-        //TODO: complete the signup process with the username, lastname and birthdate
-        await db.insertUser(email, hashedPassword);
-        const token = await JWT.sign({email}, SECRET_KEY, {expiresIn: "48h"});
+        await db.insertUser(email, hashedPassword, username, lastname, birthday);
 
-        res.json({success: true, token});
+        res.json({success: true});
     } catch(error) {
         console.error('Error during signup:', error.message);
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login',[
+    check("email","Please provide a valid email.").isEmail(),
+    check("password","Please provide a password than is greater than 5 characters").isLength({min: 6})
+], async (req, res) => {
     const {password, email} = req.body;
+
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        console.log("Error validating input: "+errors.array());
+        return res.status(400).json({success: false, message: errors.array()});
+    }
 
     try{
         let user = await db.checkIfUserExists(email);
@@ -53,15 +61,10 @@ router.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if(!isPasswordValid) {
-            console.log('User:', user);
-            console.log('Hashed Password:', user.password);
-            console.log('Entered Password:', password);
-            console.log('Is Password Valid:', isPasswordValid);
-            console.log("Error: Invalid credentials");
             return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
 
-        const token = await JWT.sign({email}, SECRET_KEY, {expiresIn: "48h"});
+        const token = await JWT.sign(user.userId, SECRET_KEY, {expiresIn: "48h"});
 
         res.json({success: true, token});
     } catch(error) {
@@ -102,7 +105,8 @@ router.post('/validate', async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid token' });
         }
         const decoded = await JWT.verify(authorization, SECRET_KEY);
-        res.json({success: true, user: decoded});
+        console.log("Decoded token: "+JSON.stringify(decoded));
+        res.json({success: true, userId: decoded});
     } catch (error) {
         console.error('Error during validation:', error.message);
         res.status(500).json({ success: false, message: 'Internal server error' });
