@@ -104,7 +104,12 @@ router.post('/validate', async (req, res) => {
             console.log("Error: Token blacklisted");
             return res.status(401).json({ success: false, message: 'Invalid token' });
         }
-        const decoded = await JWT.verify(authorization, SECRET_KEY);
+        try{
+            const decoded = await JWT.verify(authorization, SECRET_KEY);
+        } catch(error) {
+            console.error('Error during validation jwt token:', error);
+            return res.status(401).json({ success: false, message: 'Invalid token' });
+        }
         
         res.json({success: true, userId: decoded.userId});
     } catch (error) {
