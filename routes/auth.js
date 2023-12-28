@@ -25,7 +25,7 @@ router.post('/signup', [
         let user = await db.checkIfUserExists(email);
         if(user.rows.length > 0) {
             console.log("Error: User already exists");
-            return res.status(401).json({success: false, message: [{message: "User already exists"}]});
+            return res.status(401).json({success: false, message: "User already exists"});
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
