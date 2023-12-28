@@ -80,11 +80,18 @@ router.post('/logout', async (req, res) => {
         return res.status(401).json({ success: false, message: 'Token not provided' });
     }
     try {
+        const decoded = await JWT.verify(authorization, SECRET_KEY);
         await db.logoutUser(authorization);
         res.json({ success: true, message: 'Logout successful' });
 
     } catch (error) {
-        console.error('Error during logout:', error.message);
+        console.error('Error during logout:', error);
+        }
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError' || error.name === 'SyntaxError') {
+            // Token is invalid
+            console.log("Error: Invalid token");
+            return res.status(401).json({ success: false, message: 'Invalid token' });
+        }
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
@@ -116,7 +123,7 @@ router.post('/validate', async (req, res) => {
     } catch (error) {
         console.error('Error during validation:', error);
 
-        if (error.name === 'JsonWebTokenError') {
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
             // Token is invalid
             console.log("Error: Invalid token");
             return res.status(401).json({ success: false, message: 'Invalid token' });
