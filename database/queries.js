@@ -18,13 +18,18 @@ const updateUser = async (email, hashedPassword) => {
   await db.query('INSERT INTO users (email, password) VALUES ($1, $2)', [email, hashedPassword]);
 };
 
-const loginUser = async (email, hashedPassword) => {
-  await db.query('INSERT INTO users (email, password) VALUES ($1, $2)', [email, hashedPassword]);
+const startSession = async (userId, token) => {
+  await db.query('INSERT INTO user_sessions (user_id, token) VALUES ($1, $2)', [userId, token]);
 };
+
+const checkIfUserIsLogged = async (userId) => {
+  const result = await db.query('SELECT * FROM user_sessions WHERE user_id = $1', [userId]);
+  return result;
+}
 
 const logoutUser = async (token) => {
   await db.query('INSERT INTO token_blacklist (token) VALUES ($1)', [token]);
-  
+  await db.query('DELETE FROM user_sessions WHERE token = $1', [token]);
 };
 
 module.exports = {
@@ -32,5 +37,6 @@ module.exports = {
   insertUser,
   logoutUser,
   checkIfUserTokenBlacklisted,
-
+  startSession,
+  
 };

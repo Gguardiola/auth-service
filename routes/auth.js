@@ -63,8 +63,15 @@ router.post('/login',[
         if(!isPasswordValid) {
             return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
+        
+        let isLogged = await db.checkIfUserIsLogged(user.id);
+        if(isLogged.rows.length > 0) {
+            console.log("User already logged");
+            return res.json({success: true, token: isLogged.rows[0].token});
+        }
 
         const token = await JWT.sign({ userId: user.id }, SECRET_KEY, {expiresIn: "48h"});
+        await db.startSession(user.id, token);
 
         res.json({success: true, token});
     } catch(error) {
