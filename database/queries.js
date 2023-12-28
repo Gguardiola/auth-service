@@ -27,6 +27,11 @@ const checkIfUserIsLogged = async (userId) => {
   return result;
 };
 
+const checkIfUserIsLoggedByToken = async (token) => { 
+  const result = await db.query('SELECT * FROM user_sessions WHERE token = $1', [token]);
+  return result;
+}
+
 const logoutUser = async (token) => {
   await db.query('INSERT INTO token_blacklist (token) VALUES ($1)', [token]);
   await db.query('DELETE FROM user_sessions WHERE token = $1', [token]);
@@ -39,5 +44,6 @@ module.exports = {
   checkIfUserTokenBlacklisted,
   startSession,
   checkIfUserIsLogged,
+  checkIfUserIsLoggedByToken,
   
 };

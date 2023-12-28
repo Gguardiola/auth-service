@@ -87,6 +87,13 @@ router.post('/logout', async (req, res) => {
         return res.status(401).json({ success: false, message: 'Token not provided' });
     }
     try {
+
+        let isLogged = await db.checkIfUserIsLoggedByToken(authorization);
+        if(!isLogged.rows.length > 0) {
+            console.log("Error: User NOT logged");
+            return res.status(401).json({ success: false, message: 'User not logged' });
+        }
+
         const decoded = await JWT.verify(authorization, SECRET_KEY);
         await db.logoutUser(authorization);
         res.json({ success: true, message: 'Logout successful' });
