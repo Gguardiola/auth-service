@@ -85,8 +85,8 @@ router.post('/logout', async (req, res) => {
         res.json({ success: true, message: 'Logout successful' });
 
     } catch (error) {
-        console.error('Error during logout:', error);
-        }
+        console.error('Error during validation:', error);
+
         if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError' || error.name === 'SyntaxError') {
             // Token is invalid
             console.log("Error: Invalid token");
