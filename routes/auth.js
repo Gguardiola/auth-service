@@ -32,7 +32,7 @@ router.post('/signup', [
         const hashedPassword = await bcrypt.hash(password, 10);
         await db.insertUser(email, hashedPassword, username, lastname, birthday);
 
-        res.json({success: true});
+        res.json({success: true, message: "Signup successful"});
     } catch(error) {
         console.error('Error during signup:', error.message);
         res.status(500).json({ success: false, message: 'Internal server error' });
@@ -64,7 +64,7 @@ router.post('/login',[
             return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
 
-        const token = await JWT.sign(user.userId, SECRET_KEY, {expiresIn: "48h"});
+        const token = await JWT.sign(user.id, SECRET_KEY, {expiresIn: "48h"});
 
         res.json({success: true, token});
     } catch(error) {
