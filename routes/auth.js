@@ -66,7 +66,7 @@ router.post('/login',[
         
         let isLogged = await db.checkIfUserIsLogged(JSON.stringify(user.id));
         if(isLogged.rows.length > 0) {
-            console.log("User already logged");
+            console.log("Login feedback: User already logged");
             return res.json({success: true, token: isLogged.rows[0].token});
         }
 
