@@ -14,10 +14,6 @@ const insertUser = async (email, hashedPassword, username, lastname, birthday) =
   await db.query('INSERT INTO users (email, username, lastname, password, birthday, image_name) VALUES ($1, $3, $4, $2, $5, $6)', [email, hashedPassword, username, lastname, birthday, 'default.png' ]);
 };
 
-const updateUser = async (email, hashedPassword) => {
-  await db.query('INSERT INTO users (email, password) VALUES ($1, $2)', [email, hashedPassword]);
-};
-
 const startSession = async (userId, token) => {
   await db.query('INSERT INTO user_sessions (user_id, token) VALUES ($1, $2)', [userId, token]);
 };
