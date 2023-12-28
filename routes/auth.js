@@ -108,7 +108,7 @@ router.post('/validate', async (req, res) => {
         
         res.json({success: true, userId: decoded.userId});
     } catch (error) {
-        console.error('Error during validation:', error.message);
+        console.error('Error during validation:', error);
 
         if (error.name === 'JsonWebTokenError') {
             // Token is invalid
