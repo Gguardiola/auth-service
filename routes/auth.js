@@ -109,6 +109,12 @@ router.post('/validate', async (req, res) => {
         res.json({success: true, userId: decoded.userId});
     } catch (error) {
         console.error('Error during validation:', error.message);
+
+        if (error.name === 'JsonWebTokenError') {
+            // Token is invalid
+            console.log("Error: Invalid token");
+            return res.status(401).json({ success: false, message: 'Invalid token' });
+        }
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
