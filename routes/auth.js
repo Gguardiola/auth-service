@@ -64,7 +64,7 @@ router.post('/login',[
             return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
 
-        const token = await JWT.sign(user.id, SECRET_KEY, {expiresIn: "48h"});
+        const token = await JWT.sign({ userId: user.id }, SECRET_KEY, {expiresIn: "48h"});
 
         res.json({success: true, token});
     } catch(error) {
