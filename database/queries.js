@@ -15,11 +15,11 @@ const insertUser = async (email, hashedPassword, username, lastname, birthday) =
 };
 
 const startSession = async (userId, token) => {
-  await db.query('INSERT INTO user_sessions (user_id, token) VALUES ($1, $2)', [userId, token]);
+  await db.query('INSERT INTO user_sessions (user_id, token) VALUES ($1::uuid, $2)', [userId, token]);
 };
 
 const checkIfUserIsLogged = async (userId) => {
-  const result = await db.query('SELECT * FROM user_sessions WHERE user_id = $1', [userId]);
+  const result = await db.query('SELECT * FROM user_sessions WHERE user_id = $1::uuid', [userId]);
   return result;
 };
 
