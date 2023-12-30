@@ -31,7 +31,6 @@ router.post('/signup', [
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         await db.insertUser(email, hashedPassword, username, lastname, birthday);
-
         res.json({success: true, message: "Signup successful"});
     } catch(error) {
         console.error('Error during signup:', error.message);
