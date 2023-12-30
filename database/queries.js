@@ -20,7 +20,8 @@ const startSession = async (userId, token) => {
 };
 
 const checkIfUserIsLogged = async (userId) => {
-  const result = await db.query('SELECT * FROM user_sessions WHERE user_id = $1::uuid', [userId]);
+  userId = userId.replace(/^"|"$/g, '');
+  const result = await db.query('SELECT * FROM user_sessions WHERE user_id = $1', [userId]);
   return result;
 };
 
