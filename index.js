@@ -1,6 +1,7 @@
 const express = require('express');
 const auth = require('./routes/auth');
 const app = express();
+app.set('trust proxy', true);
 app.use(express.json());
 if(process.env.NODE_ENV != "production") require('dotenv').config();
 
