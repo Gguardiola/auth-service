@@ -1,7 +1,5 @@
 const express = require('express');
 const auth = require('./routes/auth');
-const cors = require('cors');
-app.use(cors());
 const app = express();
 app.use(express.json());
 if(process.env.NODE_ENV != "production") require('dotenv').config();
