@@ -62,8 +62,17 @@ router.post('/login',[
         if(!isPasswordValid) {
             return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
-        
         let isLogged = await db.checkIfUserIsLogged(JSON.stringify(user.id));
+        //TODO: Check if token is valid - verificar si el token que tiene no ha expirado, aunque ya exista la sesion, no le des el mismo token! pasar a blacklist y quitar session
+        //lastToken = isLogged.rows[0].token
+        //const isValid = await JWT.verify(lastToken, SECRET_KEY);
+        //if(!isValid) {
+        //    console.log("Error: Expired token");
+        //    const token = await JWT.sign({ userId: user.id }, SECRET_KEY, {expiresIn: "48h"});
+        //    await db.startSession(user.id, token);
+        //    res.json({success: true, token});
+        //}
+
         if(isLogged.rows.length > 0) {
             console.log("Login feedback: User already logged");
             return res.json({success: true, token: isLogged.rows[0].token});
