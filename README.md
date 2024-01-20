@@ -21,7 +21,7 @@ I have developed this service to be part of my microservices architecture to imp
 
 #### Signup
 
-```http
+```
   POST /auth/signup
 ```
 
@@ -49,7 +49,7 @@ Response body:
 
 #### Login
 
-```http
+```
   POST /auth/login
 ```
 Request body:
@@ -70,11 +70,11 @@ Response body:
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0NzQ0NWE4OS02ZjcyLTQ5NjctYmM2Ny03YjA1M2ZjMDEyYjkiLCJpYXQiOjE3MDQyNDQzMzcsImV4cCI6MTcwNDQxNzEzN30.f5D1BvD0qGKI8sELSO2ehzePxfM1RAcwKWdqCAXQ9_s"
 }
 ```
-**NOTE:** the `token` should be stored in browser cookies.
+**NOTE:** the `token` should be stored (e.g. browser cookies/local storage).
 
 #### Logout
 
-```http
+```
   POST /auth/logout
 ```
 | Header | Type     | Value                       |
